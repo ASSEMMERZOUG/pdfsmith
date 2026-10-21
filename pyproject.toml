@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdfsmith"
+version = "1.0.0"
+description = "Client-ready PDF reports from plain Python - no dependencies"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "Assem Merzoug"}]
+keywords = ["pdf", "report", "pentest", "security", "no-dependencies"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Text Processing :: Markup",
+]
+
+[project.urls]
+Homepage = "https://github.com/ASSEMMERZOUG/pdfsmith"
+Documentation = "https://github.com/ASSEMMERZOUG/pdfsmith/blob/master/docs/GUIDE.md"
+
+[tool.setuptools]
+packages = ["pdfsmith"]
