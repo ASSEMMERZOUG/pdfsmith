@@ -17,5 +17,5 @@ from .doc import Doc, PAGE_W, PAGE_H
 from .report import Report
 from . import style
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __all__ = ["Doc", "Report", "style", "PAGE_W", "PAGE_H"]

@@ -3,6 +3,7 @@
 Start to finish: install, write a report, style it, check it.
 
 - [Install](#install)
+- [Command line](#command-line)
 - [Your first report](#your-first-report)
 - [How it works](#how-it-works)
 - [The cover page](#the-cover-page)
@@ -27,10 +28,11 @@ Start to finish: install, write a report, style it, check it.
 ## Install
 
 ```bash
-pip install pdfsmith
+pip install git+https://github.com/ASSEMMERZOUG/pdfsmith
 ```
 
-From a checkout, no install needed - `examples/` adds the repo root to
+That puts the `pdfsmith` command on your PATH. From a checkout, no install
+needed - `examples/` adds the repo root to
 `sys.path` itself:
 
 ```bash
@@ -41,6 +43,76 @@ python3 examples/minimal.py /tmp/minimal.pdf
 
 Requirements: Python 3.8+, nothing else. No Pillow, no reportlab, no TeX, no
 browser.
+
+## Command line
+
+`pdfsmith` builds a report from a JSON file. Installed, it is `pdfsmith`; from
+a checkout it is `python3 -m pdfsmith`.
+
+```
+python3 -m pdfsmith report.json -o report.pdf
+wrote report.pdf (6 pages)
+```
+
+`-o` overrides the spec's `output` key. Relative paths - the output and any
+figure - resolve against the **spec file's directory**, not the shell's
+working directory, so a report folder can be built from anywhere.
+
+After writing, the structural check runs (`--no-check` to skip it). A bad
+spec is an error, with the block index:
+
+```
+$ python3 -m pdfsmith report.json
+pdfsmith: blocks[4]: unknown block 'paragraf'; known blocks: bullets, callout,
+code, cover, figure, finding, h2, h3, kv, numbered, pagebreak, para, quote,
+section, spacer, table, toc
+```
+
+### The spec
+
+Top level, all optional except `blocks` and an output path:
+
+| Key | Type | Meaning |
+|---|---|---|
+| `title`, `author` | string | PDF metadata |
+| `header` | string | running header, `%d` is the page number (`%%` is a literal `%`) |
+| `footer` | string | grey line at the bottom |
+| `watermark` | string | diagonal text behind the content |
+| `margin`, `top`, `bottom` | number | page geometry in points |
+| `output` | string | where to write the PDF |
+| `cover` | object | see below |
+| `toc` | `true` or `{"heading": "Contents"}` | contents page |
+| `blocks` | array | the document, in order |
+
+The cover takes the same fields as `Report.cover()`:
+`kicker`, `org`, `title` (a list of lines), `subtitle`, `facts`
+(`[[label, value], ...]`), `blurb` (list of paragraphs) and `badge`.
+
+Each block is an object with exactly one key:
+
+| Block | JSON |
+|---|---|
+| `section` | `{"num": "1", "title": "Summary", "new_page": "auto"}` (`new_page`: `true`, `false`, `"auto"`) |
+| `h2`, `h3` | a string |
+| `para` | a string, or `{"text": "...", "size": 10, "space_after": 7}` |
+| `bullets`, `numbered` | a list of strings, or `{"items": [...], "size": 9.8}` |
+| `quote` | a string |
+| `callout` | `{"title": "...", "text": "..."}` |
+| `code` | a list of lines, or `{"lines": [...], "size": 8.2}` |
+| `table` | `{"headers": [...], "rows": [[...]], "widths": [...], "size": 8.6}` |
+| `figure` | `{"path": "shot.png", "caption": "...", "max_h": 300}` |
+| `kv` | `[["Label", "Value"], ["Tools", ["one", "two"]]]` |
+| `finding` | `{"id", "severity", "title", "where", "what", "impact", "proof", "fix"}` |
+| `spacer` | points, or `{"h": 12}` |
+| `pagebreak` | `true` |
+
+Inline `**bold**` and `` `code` `` work in every text field, exactly as they do
+in Python. `examples/report.json` is a complete document using most of the
+schema; build it with:
+
+```
+python3 -m pdfsmith examples/report.json -o /tmp/acme.pdf
+```
 
 ## Your first report
 

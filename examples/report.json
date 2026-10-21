@@ -1,0 +1,101 @@
+{
+  "title": "Acme - web assessment",
+  "author": "Assem Merzoug",
+  "header": "ACME | WEB ASSESSMENT // CONFIDENTIAL | Page %d",
+  "footer": "Acme Ltd - confidential",
+  "watermark": "CONFIDENTIAL",
+  "output": "acme_report.pdf",
+
+  "cover": {
+    "kicker": "Penetration test report",
+    "org": "Acme Ltd",
+    "title": ["Acme", "web assessment"],
+    "subtitle": "Three findings across the customer portal. One critical.",
+    "facts": [
+      ["Client", "Acme Ltd"],
+      ["Scope", "portal.acme.example, api.acme.example"],
+      ["Engagement", "6 - 10 October 2026"],
+      ["Version", "1.0"]
+    ],
+    "blurb": [
+      "Testing covered the customer portal and the API behind it, from a clean unauthenticated start and from two customer accounts issued for the engagement."
+    ],
+    "badge": "1 CRITICAL"
+  },
+
+  "toc": true,
+
+  "blocks": [
+    {"section": {"num": "1", "title": "Executive summary", "new_page": true}},
+    {"para": "Any customer can read any other customer's invoice. That is the only issue that needs fixing this week."},
+    {"bullets": [
+      "One critical issue, one high, no false positives.",
+      "Every issue reproduced twice from a clean account.",
+      "The report includes the exact requests, so the fixes can be verified."
+    ]},
+    {"callout": {"title": "If you fix one thing", "text": "Scope every invoice query by the session's account, and return 404 instead of 403 so the caller cannot enumerate what exists."}},
+
+    {"section": {"num": "2", "title": "Findings"}},
+    {"finding": {
+      "id": "F-01",
+      "severity": "CRITICAL",
+      "title": "Any customer can read any invoice",
+      "where": "GET /api/invoices/{id}",
+      "what": "The endpoint returns the invoice without checking who owns it. Changing the id in the request returns another account's billing data.",
+      "proof": [
+        "GET /api/invoices/10481 HTTP/1.1",
+        "Cookie: session=<test account A>",
+        "",
+        "HTTP/1.1 200 OK",
+        "{\"customer\":\"B\",\"total\":\"4,120.00 EUR\"}"
+      ],
+      "impact": "Billing data, addresses and invoice history for every customer are readable by any authenticated user.",
+      "fix": [
+        "Scope the query by the session's account.",
+        "Return 404, not 403."
+      ]
+    }},
+    {"finding": {
+      "id": "F-02",
+      "severity": "HIGH",
+      "title": "Stored script injection in shipment notes",
+      "where": "POST /api/shipments/{id}/notes",
+      "what": "Notes are stored verbatim and rendered with innerHTML on the operator console.",
+      "proof": [
+        "POST /api/shipments/88213/notes",
+        "{\"note\":\"<img src=x onerror=alert(1)>\"}"
+      ],
+      "impact": "A customer account acts as an operator when a shipment is opened.",
+      "fix": ["Render notes as text.", "Add a CSP that forbids inline script."]
+    }},
+
+    {"section": {"num": "3", "title": "How to fix it"}},
+    {"para": "**Fix the ownership check first.** It is a single query change and the only issue with customer data exposed today."},
+    {"numbered": ["Scope invoice reads by the session's account.", "Deploy the CSP report-only, then enforce it.", "Re-test both findings from a clean account."]},
+    {"table": {
+      "headers": ["Priority", "Action", "Owner"],
+      "rows": [
+        ["1", "Scope invoice queries by account", "Backend"],
+        ["2", "Sanitise shipment notes and add a CSP", "Frontend"],
+        ["3", "Re-test from a clean account", "Security"]
+      ],
+      "widths": [0.8, 4.6, 1.4]
+    }},
+
+    {"section": {"num": "A", "title": "Appendix - requests and responses"}},
+    {"code": [
+      "GET /api/invoices/10481 HTTP/1.1",
+      "Host: portal.acme.example",
+      "Cookie: session=<account A>",
+      "",
+      "HTTP/1.1 200 OK",
+      "Content-Type: application/json"
+    ]},
+    {"h3": "Method"},
+    {"kv": [
+      ["Scope", "portal.acme.example, api.acme.example"],
+      ["Window", "6 - 10 October 2026, 09:00 - 18:00"],
+      ["Tools", ["Burp Suite Pro", "ffuf", "custom Python scripts"]]
+    ]}
+  ]
+}

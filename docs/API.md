@@ -112,6 +112,25 @@ Renders twice and writes `path`. Returns the page count.
 
 ---
 
+## `build` - JSON specs
+
+```python
+from pdfsmith.build import build_file, report_from_spec, SpecError, main
+
+path, pages = build_file("report.json", out_path=None, run_check=True)
+report, target = report_from_spec(spec_dict, base_dir=".")
+main(["report.json", "-o", "out.pdf"])      # the CLI, callable
+```
+
+`report_from_spec()` returns a configured `Report` without building it, which
+is the seam for a web form or a generated spec. `build_file()` builds and, by
+default, runs `check()` on the result. `SpecError` names the offending block,
+e.g. `blocks[3]: table.rows[0]: expected 2 cells, one per header`.
+
+Schema: `docs/GUIDE.md#command-line`.
+
+---
+
 ## `Doc`
 
 Low level: you place every element yourself against a vertical cursor.

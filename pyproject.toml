@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pdfsmith"
-version = "1.0.0"
+version = "1.1.0"
 description = "Client-ready PDF reports from plain Python - no dependencies"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -17,6 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Text Processing :: Markup",
 ]
+
+[project.scripts]
+pdfsmith = "pdfsmith.build:main"
 
 [project.urls]
 Homepage = "https://github.com/ASSEMMERZOUG/pdfsmith"
