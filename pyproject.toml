@@ -23,7 +23,7 @@ pdfsmith = "pdfsmith.build:main"
 
 [project.urls]
 Homepage = "https://github.com/ASSEMMERZOUG/pdfsmith"
-Documentation = "https://github.com/ASSEMMERZOUG/pdfsmith/blob/master/docs/GUIDE.md"
+Documentation = "https://github.com/ASSEMMERZOUG/pdfsmith/blob/main/docs/GUIDE.md"
 
 [tool.setuptools]
 packages = ["pdfsmith"]
